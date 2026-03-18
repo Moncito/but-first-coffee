@@ -1,77 +1,87 @@
 "use client";
 
-import React from "react";
-import { motion } from "framer-motion";
+import React, { useEffect, useRef } from "react";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { Star } from "lucide-react";
+
+gsap.registerPlugin(ScrollTrigger);
 
 const testimonials = [
   {
     name: "Marcus V.",
     text: "The smoothest extraction I've ever had. Truly a premium experience.",
-    award: "Verified Sommelier",
+    award: "Verified Roast Master",
   },
   {
     name: "Elena G.",
-    text: "Midnight Roast has redefined my morning ritual. Those Ethiopian beans are magic.",
-    award: "Home Barista Champion",
+    text: "But First Coffee has redefined my morning ritual. Those Ethiopian beans are magic.",
+    award: "Certified Sommelier",
   },
   {
     name: "James K.",
     text: "The delivery is always on point, and the nitrogen seal really keeps it fresh.",
-    award: "Coffee Aficionado",
-  },
-  {
-    name: "Sarah L.",
-    text: "Visuals pulled me in, the taste kept me. Best subscription service out there.",
-    award: "Verified Buyer",
-  },
-  {
-    name: "David R.",
-    text: "I didn't believe the uniformity until I saw it under my macro lens. Incredible.",
-    award: "Roast Master",
+    award: "Certified Barista",
   },
 ];
 
 export default function Testimonials() {
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    // Parallax effect for cards
+    const cards = gsap.utils.toArray(".testimonial-card");
+    cards.forEach((card: any, i: number) => {
+      gsap.to(card, {
+        y: -100 * (i + 1),
+        ease: "none",
+        scrollTrigger: {
+          trigger: card,
+          start: "top bottom",
+          end: "bottom top",
+          scrub: true,
+        },
+      });
+    });
+  }, []);
+
   return (
-    <section className="py-24 bg-[#050505] overflow-hidden border-y border-white/5">
-      <div className="max-w-6xl mx-auto px-6 mb-12">
-        <h2 className="text-3xl font-serif text-white/50 tracking-widest uppercase text-sm">
+    <section className="py-32 bg-[#F5F5F7] overflow-hidden">
+      <div className="max-w-6xl mx-auto px-6 mb-20 text-center">
+        <h2 className="text-sm font-mono text-slate-400 uppercase tracking-[0.4em] mb-4">
           The Wall of Love
         </h2>
+        <p className="text-4xl md:text-5xl font-bold text-black-rich">
+          Trusted by Specialists.
+        </p>
       </div>
 
-      <div className="flex relative items-center">
-        {/* Marquee Animation */}
-        <motion.div
-          animate={{ x: ["0%", "-50%"] }}
-          transition={{ duration: 30, repeat: Infinity, ease: "linear" }}
-          className="flex gap-8 whitespace-nowrap"
-        >
-          {[...testimonials, ...testimonials].map((t, i) => (
-            <div
-              key={i}
-              className="w-[400px] bg-[#111] p-8 rounded-2xl border border-white/5 flex flex-col justify-between"
-            >
-              <div className="mb-6">
-                <div className="flex gap-1 mb-4">
-                  {[...Array(5)].map((_, j) => (
-                    <Star key={j} className="w-4 h-4 fill-[#D4AF37] text-[#D4AF37]" />
-                  ))}
-                </div>
-                <p className="text-white/80 text-lg italic leading-relaxed whitespace-normal">
-                  "{t.text}"
-                </p>
+      <div ref={scrollRef} className="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-3 gap-8 pb-32">
+        {testimonials.map((t, i) => (
+          <div
+            key={i}
+            className="testimonial-card bg-white p-10 rounded-[32px] shadow-sm border border-black/5 flex flex-col justify-between"
+          >
+            <div>
+              <div className="flex gap-1 mb-6">
+                {[...Array(5)].map((_, j) => (
+                  <Star key={j} className="w-4 h-4 fill-black text-black" />
+                ))}
               </div>
-              <div className="flex justify-between items-center">
-                <span className="text-white font-serif text-xl">{t.name}</span>
-                <span className="text-[10px] font-mono uppercase tracking-tighter bg-[#D4AF37] text-black px-2 py-1 rounded">
+              <p className="text-black-rich text-xl italic leading-relaxed mb-8">
+                "{t.text}"
+              </p>
+            </div>
+            <div className="flex justify-between items-end">
+              <div>
+                <span className="text-black-rich font-bold block mb-1">{t.name}</span>
+                <span className="text-[9px] font-mono uppercase tracking-[0.2em] text-slate-400 bg-slate-100 px-2 py-1 rounded">
                   {t.award}
                 </span>
               </div>
             </div>
-          ))}
-        </motion.div>
+          </div>
+        ))}
       </div>
     </section>
   );

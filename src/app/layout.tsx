@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter_Tight, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import SmoothScroll from "@/components/SmoothScroll";
 
 const interTight = Inter_Tight({
   variable: "--font-inter-tight",
@@ -14,8 +15,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Midnight Roast | Obsessively Sourced Coffee",
-  description: "Experience the ritual of premium, single-origin coffee with our scrollytelling journey.",
+  title: "But First Coffee | The Premium Ritual",
+  description: "Experience the obsessive ritual of single-origin coffee with our scrollytelling journey.",
 };
 
 export default function RootLayout({
@@ -26,7 +27,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${interTight.variable} ${geistMono.variable} antialiased`}>
-        {children}
+        <SmoothScroll>
+          {children}
+        </SmoothScroll>
       </body>
     </html>
   );

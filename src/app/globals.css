@@ -1,9 +1,10 @@
 @import "tailwindcss";
 
 :root {
-  --background: #050505;
+  --background: #0A0A0A;
   --foreground: #ffffff;
-  --accent: #D4AF37;
+  --off-white: #F5F5F7;
+  --slate-grey: #2D2D2D;
 }
 
 body {
@@ -15,11 +16,10 @@ body {
 }
 
 ::selection {
-  background: var(--accent);
+  background: var(--off-white);
   color: #000;
 }
 
-/* Custom transitions and utilities if needed */
 .font-serif {
   font-family: var(--font-inter-tight), serif;
   font-weight: 700;
@@ -29,4 +29,17 @@ body {
 .font-mono {
   font-family: var(--font-geist-mono), monospace;
   letter-spacing: 0.1em;
+}
+
+/* Custom Utilities */
+.text-slate-400 {
+  color: #94a3b8; /* Tailwind default for slate-400 */
+}
+
+.bg-off-white {
+  background-color: var(--off-white);
+}
+
+.text-black-rich {
+  color: #0A0A0A;
 }

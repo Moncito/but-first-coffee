@@ -1,34 +1,21 @@
 "use client";
 
-import React, { useEffect, useRef, useState, useMemo } from "react";
-import { useScroll, useTransform, useSpring, motion, AnimatePresence } from "framer-motion";
+import React, { useEffect, useRef, useState } from "react";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+
+gsap.registerPlugin(ScrollTrigger);
 
 interface CoffeeCanvasProps {
   frameCount?: number;
 }
 
-export default function CoffeeCanvas({ frameCount = 240 }: CoffeeCanvasProps) {
+export default function CoffeeCanvas({ frameCount = 120 }: CoffeeCanvasProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [images, setImages] = useState<HTMLImageElement[]>([]);
   const [loadedCount, setLoadedCount] = useState(0);
   const [isLoaded, setIsLoaded] = useState(false);
-
-  // Scroll logic
-  const { scrollYProgress } = useScroll({
-    target: containerRef,
-    offset: ["start start", "end end"],
-  });
-
-  // Smooth the scroll progress
-  const smoothProgress = useSpring(scrollYProgress, {
-    stiffness: 50,
-    damping: 20,
-    restDelta: 0.001,
-  });
-
-  // Map scroll progress (0-1) to frame index (0-239)
-  const frameIndex = useTransform(smoothProgress, [0, 1], [0, frameCount - 1]);
 
   // Preload images
   useEffect(() => {
@@ -37,6 +24,7 @@ export default function CoffeeCanvas({ frameCount = 240 }: CoffeeCanvasProps) {
 
     for (let i = 0; i < frameCount; i++) {
       const img = new Image();
+      // Ensure we use the correct frame padding (000 to 119)
       const frameStr = i.toString().padStart(3, "0");
       img.src = `/assets/coffee-sequence/frame_${frameStr}_delay-0.033s.jpg`;
       img.onload = () => {
@@ -51,150 +39,136 @@ export default function CoffeeCanvas({ frameCount = 240 }: CoffeeCanvasProps) {
     setImages(loadedImages);
   }, [frameCount]);
 
-  // Draw frame on canvas
+  // GSAP ScrollTrigger for Canvas
   useEffect(() => {
-    if (!isLoaded || images.length === 0) return;
+    if (!isLoaded || images.length === 0 || !canvasRef.current || !containerRef.current) return;
+
+    const canvas = canvasRef.current;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
 
     const render = (index: number) => {
-      const canvas = canvasRef.current;
-      const ctx = canvas?.getContext("2d");
-      if (!canvas || !ctx) return;
-
       const img = images[Math.floor(index)];
       if (!img) return;
 
-      // Clear and draw
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-      
-      // Object-fit: contain logic for canvas
       const scale = Math.min(canvas.width / img.width, canvas.height / img.height);
       const x = (canvas.width - img.width * scale) / 2;
       const y = (canvas.height - img.height * scale) / 2;
-      
       ctx.drawImage(img, x, y, img.width * scale, img.height * scale);
     };
 
-    const unsubscribe = frameIndex.on("change", (latest) => {
-      render(latest);
+    // Canvas animation
+    const tl = gsap.to({ frame: 0 }, {
+      frame: frameCount - 1,
+      snap: "frame",
+      ease: "none",
+      onUpdate: function() {
+        render(this.targets()[0].frame);
+      },
+      scrollTrigger: {
+        trigger: containerRef.current,
+        start: "top top",
+        end: "bottom bottom",
+        scrub: 1.5,
+      }
     });
 
-    // Initial render
-    render(0);
+    // Text animations based on percentages
+    const textBeats = [
+      { id: "beat-1", start: 0, end: 0.2, align: "left", title: "Obsessively Sourced.", sub: "Single-origin beans from the volcanic soil of Ethiopia." },
+      { id: "beat-2", start: 0.25, end: 0.45, align: "right", title: "The Perfect Grind.", sub: "Uniformity to the micron for unparalleled extraction." },
+      { id: "beat-3", start: 0.5, end: 0.7, align: "left", title: "Artisan Extraction.", sub: "Captured at the peak of the bloom." },
+      { id: "beat-4", start: 0.75, end: 0.9, align: "right", title: "But First Coffee.", sub: "Your morning, redefined." },
+      { id: "beat-5", start: 0.95, end: 1, align: "center", title: "THE RITUAL BEGINS.", sub: "" },
+    ];
 
-    return () => unsubscribe();
-  }, [isLoaded, images, frameIndex]);
+    textBeats.forEach((beat) => {
+      gsap.fromTo(
+        `.${beat.id}`,
+        { opacity: 0, y: 50, scale: beat.id === 'beat-5' ? 0.8 : 1 },
+        {
+          opacity: 1,
+          y: 0,
+          scale: beat.id === 'beat-5' ? 1.2 : 1,
+          scrollTrigger: {
+            trigger: containerRef.current,
+            start: `${beat.start * 100}% top`,
+            end: `${beat.end * 100}% top`,
+            scrub: 1,
+            toggleActions: "play reverse play reverse",
+          },
+        }
+      );
+    });
 
-  // Resize canvas
+    return () => {
+      tl.kill();
+      ScrollTrigger.getAll().forEach(st => st.kill());
+    };
+  }, [isLoaded, images, frameCount]);
+
+  // Handle Resize
   useEffect(() => {
     const handleResize = () => {
-      const canvas = canvasRef.current;
-      if (!canvas) return;
-      canvas.width = window.innerWidth * window.devicePixelRatio;
-      canvas.height = window.innerHeight * window.devicePixelRatio;
-      // Re-render current frame
-      const currentFrame = Math.floor(frameIndex.get());
-      if (images[currentFrame]) {
-        const ctx = canvas.getContext("2d");
-        if (ctx) {
-          const img = images[currentFrame];
-          const scale = Math.min(canvas.width / img.width, canvas.height / img.height);
-          const x = (canvas.width - img.width * scale) / 2;
-          const y = (canvas.height - img.height * scale) / 2;
-          ctx.drawImage(img, x, y, img.width * scale, img.height * scale);
-        }
-      }
+      if (!canvasRef.current) return;
+      canvasRef.current.width = window.innerWidth * window.devicePixelRatio;
+      canvasRef.current.height = window.innerHeight * window.devicePixelRatio;
     };
-
     handleResize();
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
-  }, [isLoaded, images, frameIndex]);
+  }, []);
 
   return (
-    <div ref={containerRef} className="relative h-[800vh] bg-[#050505] w-full">
-      {/* Sticky Canvas Container */}
+    <div ref={containerRef} className="relative h-[800vh] bg-[#0A0A0A] w-full">
       <div className="sticky top-0 h-screen w-full flex items-center justify-center overflow-hidden">
         <canvas
           ref={canvasRef}
           className="w-full h-full object-contain pointer-events-none"
-          style={{ willChange: "transform" }}
         />
 
-        {/* Storyboard Overlay Text */}
-        <div className="absolute inset-0 flex flex-col items-center justify-center p-6 text-center pointer-events-none">
-          <BeatText progress={smoothProgress} />
+        {/* Text Beat Elements */}
+        <div className="absolute inset-0 z-10 p-12 pointer-events-none flex flex-col justify-center">
+          <div className="relative w-full h-full max-w-7xl mx-auto flex flex-col justify-center items-center">
+            
+            <div className="beat-1 absolute left-0 text-left opacity-0">
+              <h2 className="text-6xl font-bold text-white mb-4">Obsessively Sourced.</h2>
+              <p className="text-xl text-slate-400 font-mono tracking-widest max-w-sm uppercase">
+                Single-origin beans from the volcanic soil of Ethiopia.
+              </p>
+            </div>
+
+            <div className="beat-2 absolute right-0 text-right opacity-0">
+              <h2 className="text-6xl font-bold text-white mb-4">The Perfect Grind.</h2>
+              <p className="text-xl text-slate-400 font-mono tracking-widest max-w-sm uppercase ml-auto">
+                Uniformity to the micron for unparalleled extraction.
+              </p>
+            </div>
+
+            <div className="beat-3 absolute left-0 text-left opacity-0">
+              <h2 className="text-6xl font-bold text-white mb-4">Artisan Extraction.</h2>
+              <p className="text-xl text-slate-400 font-mono tracking-widest max-w-sm uppercase">
+                Captured at the peak of the bloom.
+              </p>
+            </div>
+
+            <div className="beat-4 absolute right-0 text-right opacity-0">
+              <h2 className="text-6xl font-bold text-white mb-4">But First Coffee.</h2>
+              <p className="text-xl text-slate-400 font-mono tracking-widest max-w-sm uppercase ml-auto">
+                Your morning, redefined.
+              </p>
+            </div>
+
+            <div className="beat-5 text-center opacity-0">
+              <h2 className="text-8xl md:text-9xl font-bold text-white tracking-tighter">
+                THE RITUAL BEGINS.
+              </h2>
+            </div>
+
+          </div>
         </div>
       </div>
-
-      {/* Loading State */}
-      <AnimatePresence>
-        {!isLoaded && (
-          <motion.div
-            initial={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-[#050505] text-[#D4AF37]"
-          >
-            <div className="text-6xl font-serif mb-4 italic">Midnight Roast</div>
-            <div className="w-64 h-1 bg-white/10 rounded-full overflow-hidden">
-              <motion.div
-                className="h-full bg-[#D4AF37]"
-                initial={{ width: 0 }}
-                animate={{ width: `${(loadedCount / frameCount) * 100}%` }}
-              />
-            </div>
-            <div className="mt-4 font-mono text-sm uppercase tracking-widest">
-              Brewing Experience... {Math.round((loadedCount / frameCount) * 100)}%
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
     </div>
-  );
-}
-
-function BeatText({ progress }: { progress: any }) {
-  const opacities = [
-    useTransform(progress, [0.05, 0.1, 0.2, 0.25], [0, 1, 1, 0]),
-    useTransform(progress, [0.3, 0.35, 0.45, 0.5], [0, 1, 1, 0]),
-    useTransform(progress, [0.55, 0.6, 0.7, 0.75], [0, 1, 1, 0]),
-    useTransform(progress, [0.8, 0.85, 0.95, 1], [0, 1, 1, 0]),
-  ];
-
-  const beats = [
-    {
-      title: "Obsessively Sourced.",
-      sub: "Single-origin beans from the volcanic soil of Ethiopia.",
-    },
-    {
-      title: "The Perfect Grind.",
-      sub: "Uniformity to the micron for unparalleled extraction.",
-    },
-    {
-      title: "Artisan Extraction.",
-      sub: "Captured at the peak of the bloom.",
-    },
-    {
-      title: "Midnight Roast.",
-      sub: "Your morning, redefined.",
-    },
-  ];
-
-  return (
-    <>
-      {beats.map((beat, i) => (
-        <motion.div
-          key={i}
-          style={{ opacity: opacities[i] }}
-          className="absolute max-w-2xl px-4"
-        >
-          <h2 className="text-5xl md:text-7xl font-serif text-white tracking-tight mb-4 drop-shadow-2xl">
-            {beat.title}
-          </h2>
-          <p className="text-xl md:text-2xl text-[#D4AF37] font-mono uppercase tracking-widest opacity-80 shadow-black drop-shadow-md">
-            {beat.sub}
-          </p>
-        </motion.div>
-      ))}
-    </>
   );
 }
