@@ -265,7 +265,7 @@ export default function Features() {
                   Brew Guides
                 </div>
               </div>
-              <button className="text-[#D35400] font-bold hover:underline">Shop Gear</button>
+              <button className="text-[#D35400] font-bold hover:underline">Shop Gear.</button>
             </div>
           </div>
 
