@@ -20,12 +20,10 @@ export default function Home() {
         <Navbar />
         
         {/* The Scrollytelling Engine */}
-        <section className="relative">
-          <CoffeeCanvas frameCount={120} />
-        </section>
+        <CoffeeCanvas frameCount={240} />
 
-        {/* Post-Animation Sections */}
-        <div className="relative z-10 transition-colors duration-1000">
+        {/* Post-Animation Sections — flush against canvas */}
+        <div className="relative z-10">
           <Features />
           <Testimonials />
           <FinalCTA />

@@ -3,111 +3,131 @@
 import React, { useEffect, useRef } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { Leaf, Flame, ShieldCheck } from "lucide-react";
+import { Coffee, Layers, Zap } from "lucide-react";
 
 gsap.registerPlugin(ScrollTrigger);
 
 export default function Features() {
-  const sectionRef = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    // Background color wipe from Black to Off-white
-    gsap.to(sectionRef.current, {
+    // Reveal header
+    gsap.fromTo(".features-header", 
+      { opacity: 0, y: 30 },
+      { 
+        opacity: 1, 
+        y: 0, 
+        duration: 1, 
+        scrollTrigger: {
+          trigger: ".features-header",
+          start: "top 80%",
+        }
+      }
+    );
+
+    // Progressive card loading
+    const cards = gsap.utils.toArray(".bento-card");
+    cards.forEach((card: any, i: number) => {
+      gsap.fromTo(card, 
+        { opacity: 0, scale: 0.95, y: 50 },
+        {
+          opacity: 1,
+          scale: 1,
+          y: 0,
+          duration: 0.8,
+          delay: i * 0.1,
+          ease: "power3.out",
+          scrollTrigger: {
+            trigger: card,
+            start: "top 85%",
+          }
+        }
+      );
+    });
+
+    // Background transition
+    gsap.to(containerRef.current, {
       backgroundColor: "#F5F5F7",
       scrollTrigger: {
-        trigger: sectionRef.current,
-        start: "top 80%",
+        trigger: containerRef.current,
+        start: "top 70%",
         end: "top 20%",
         scrub: true,
-      },
+      }
     });
+
+    // Title color transition: white → dark alongside the background
+    gsap.to(".features-title", {
+      color: "#0A0A0A",
+      scrollTrigger: {
+        trigger: containerRef.current,
+        start: "top 70%",
+        end: "top 20%",
+        scrub: true,
+      }
+    });
+
   }, []);
 
   return (
     <section 
-      ref={sectionRef} 
-      className="py-32 px-6 bg-[#0A0A0A] transition-colors duration-1000"
+      id="features-section"
+      ref={containerRef}
+      className="py-40 bg-[#050505] transition-colors duration-1000 overflow-hidden"
     >
-      <div className="max-w-6xl mx-auto">
-        <div className="mb-20">
-          <h2 className="text-5xl md:text-6xl font-bold text-black-rich mb-6 opacity-0 translate-y-10 reveal-text">
-            The Three Pillars
-          </h2>
-          <p className="text-slate-500 font-mono uppercase tracking-[0.2em] text-sm opacity-0 translate-y-10 reveal-text">
-            Quality without compromise.
+      <div className="max-w-7xl mx-auto px-6">
+        <div className="features-header mb-32">
+          <h2 className="text-sm font-mono text-slate-400 uppercase tracking-[0.5em] mb-4">Engineering the Ritual</h2>
+          <p className="features-title text-5xl md:text-7xl font-bold tracking-tighter leading-none text-white">
+            Precision in<br/>every molecule.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {/* Card 1: Large - Ethically Traded */}
-          <div className="md:col-span-2 bg-white p-12 rounded-[32px] shadow-sm border border-black/5 flex flex-col justify-between group hover:shadow-xl transition-all duration-500">
-            <div>
-              <div className="w-16 h-16 bg-[#F5F5F7] rounded-2xl flex items-center justify-center mb-8 group-hover:scale-110 transition-transform">
-                <Leaf className="w-8 h-8 text-[#0A0A0A]" />
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+          {/* Card 1: Main Highlight */}
+          <div className="bento-card md:col-span-2 md:row-span-2 bg-white p-12 rounded-[2.5rem] shadow-[0_4px_24px_rgba(0,0,0,0.02)] border border-black/[0.03] flex flex-col justify-between group overflow-hidden">
+            <div className="relative z-10">
+              <div className="w-20 h-20 bg-[#F5F5F7] rounded-3xl flex items-center justify-center mb-10 group-hover:scale-110 transition-transform duration-500">
+                <Coffee className="w-10 h-10 text-black-rich stroke-[1.2px]" />
               </div>
-              <h3 className="text-4xl font-bold text-black-rich mb-6">Ethically Traded.</h3>
-              <p className="text-slate-500 text-xl leading-relaxed max-w-md">
-                Direct-to-farm partnerships ensuring every bean supports the community that grew it.
+              <h3 className="text-4xl font-bold text-black-rich mb-6 tracking-tight">Ethically Traded.</h3>
+              <p className="text-slate-500 text-lg leading-relaxed max-w-sm">
+                Every bean is a pact between the farmer and your cup. Direct sourcing that honors the land.
               </p>
             </div>
-            <div className="mt-12 overflow-hidden rounded-2xl aspect-[16/9] bg-[#F5F5F7] relative">
-               {/* Visual placeholder for "Ethically Traded" image */}
-               <div className="absolute inset-0 bg-gradient-to-br from-black/5 to-transparent" />
+            <div className="mt-20 h-64 bg-[#F5F5F7]/50 rounded-2xl relative overflow-hidden">
+               <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/[0.02] to-transparent" />
+               <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-48 h-48 border-[0.5px] border-black/10 rounded-full animate-[pulse_4s_infinite]" />
             </div>
           </div>
 
-          {/* Card 2: Small - Small Batch */}
-          <div className="bg-white p-10 rounded-[32px] shadow-sm border border-black/5 flex flex-col justify-between group hover:shadow-xl transition-all duration-500">
-            <div>
-              <div className="w-14 h-14 bg-[#F5F5F7] rounded-xl flex items-center justify-center mb-6 group-hover:rotate-12 transition-transform">
-                <Flame className="w-6 h-6 text-[#0A0A0A]" />
-              </div>
-              <h3 className="text-2xl font-bold text-black-rich mb-4">Small Batch.</h3>
-              <p className="text-slate-500 text-base leading-relaxed">
-                Roasted every Tuesday in 5lb microlots for precision control.
-              </p>
-            </div>
-            <div className="mt-8 h-32 bg-[#F5F5F7] rounded-xl flex items-center justify-center">
-              <div className="w-12 h-12 border-2 border-black/10 rounded-full animate-spin border-t-black" />
-            </div>
-          </div>
-
-          {/* Card 4 (New Index in Bento) - Column 2-3 Row 2 in complex grid, or just 3rd in simple grid */}
-          <div className="bg-white p-10 rounded-[32px] shadow-sm border border-black/5 flex flex-col justify-between group hover:shadow-xl transition-all duration-500 md:col-span-1">
+          {/* Card 2: Technical Precision */}
+          <div className="bento-card md:col-span-2 bg-white p-10 rounded-[2.5rem] shadow-[0_4px_24px_rgba(0,0,0,0.02)] border border-black/[0.03] flex items-center gap-10 group">
+             <div className="w-16 h-16 shrink-0 bg-[#F5F5F7] rounded-2xl flex items-center justify-center group-hover:rotate-[15deg] transition-transform duration-500">
+                <Layers className="w-8 h-8 text-black-rich stroke-[1.2px]" />
+             </div>
              <div>
-              <div className="w-14 h-14 bg-[#F5F5F7] rounded-xl flex items-center justify-center mb-6">
-                <ShieldCheck className="w-6 h-6 text-[#0A0A0A]" />
-              </div>
-              <h3 className="text-2xl font-bold text-black-rich mb-4">Nitrogen Sealed.</h3>
-              <p className="text-slate-500 text-base leading-relaxed">
-                Freshness guaranteed for 6 months with proprietary oxygen-extraction tech.
-              </p>
-            </div>
-            <div className="mt-8 p-6 bg-[#F5F5F7] rounded-xl space-y-4">
-               <div className="h-1 bg-black/10 w-full rounded-full overflow-hidden">
-                 <div className="h-full bg-black w-3/4" />
-               </div>
-               <div className="flex justify-between font-mono text-[8px] uppercase tracking-widest text-black/40">
-                 <span>Oxygen Level</span>
-                 <span className="text-black">0.01%</span>
-               </div>
-            </div>
+                <h3 className="text-2xl font-bold text-black-rich mb-2">Micron Grind.</h3>
+                <p className="text-slate-500 text-base leading-relaxed">
+                  Uniformity measured to the sub-micron for zero bitterness.
+                </p>
+             </div>
+          </div>
+
+          {/* Card 3: Freshness Tech */}
+          <div className="bento-card md:col-span-2 bg-white p-10 rounded-[2.5rem] shadow-[0_4px_24px_rgba(0,0,0,0.02)] border border-black/[0.03] flex items-center gap-10 group">
+             <div className="w-16 h-16 shrink-0 bg-[#F5F5F7] rounded-2xl flex items-center justify-center group-hover:-rotate-[15deg] transition-transform duration-500">
+                <Zap className="w-8 h-8 text-black-rich stroke-[1.2px]" />
+             </div>
+             <div>
+                <h3 className="text-2xl font-bold text-black-rich mb-2">Nitrogen Shield.</h3>
+                <p className="text-slate-500 text-base leading-relaxed">
+                  Oxygen levels at 0.01% for a profile that never ages.
+                </p>
+             </div>
           </div>
         </div>
       </div>
-
-      <style jsx>{`
-        .reveal-text {
-          animation: reveal 1s forwards cubic-bezier(0.2, 0.8, 0.2, 1);
-          animation-play-state: paused;
-        }
-        @keyframes reveal {
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-      `}</style>
     </section>
   );
 }
