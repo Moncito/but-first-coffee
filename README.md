@@ -1,36 +1,85 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# ☕ But First, Coffee
 
-## Getting Started
+A visually rich, scroll-driven coffee shop website built with **Next.js**, **GSAP**, **Framer Motion**, and **Lenis** smooth scrolling. The site features a scrollytelling coffee-sequence animation, smooth transitions, a custom cursor, and a polished dark aesthetic.
 
-First, run the development server:
+## ✨ Features
+
+- **Scrollytelling Canvas** — A 240-frame coffee image sequence that plays as you scroll, powered by GSAP ScrollTrigger.
+- **Smooth Scrolling** — Buttery smooth scroll experience using Lenis.
+- **Intro Loader** — Animated loading screen before the main content reveals.
+- **Custom Cursor** — A bespoke cursor component for a premium feel.
+- **Sections** — Features, Testimonials, and a Final CTA section with scroll-based animations.
+- **Dark Theme** — A sleek `#0A0A0A` dark background throughout.
+
+## 🛠 Tech Stack
+
+| Technology                                     | Purpose                                  |
+| ---------------------------------------------- | ---------------------------------------- |
+| [Next.js 16](https://nextjs.org)               | React framework (App Router)             |
+| [React 19](https://react.dev)                  | UI library                               |
+| [GSAP](https://gsap.com)                       | Scroll-driven animations & ScrollTrigger |
+| [Framer Motion](https://www.framer.com/motion) | Component animations                     |
+| [Lenis](https://lenis.darkroom.engineering)    | Smooth scrolling                         |
+| [Tailwind CSS 4](https://tailwindcss.com)      | Utility-first styling                    |
+| [Lucide React](https://lucide.dev)             | Icons                                    |
+| TypeScript                                     | Type safety                              |
+
+## 🚀 Getting Started
+
+### Prerequisites
+
+- Node.js 18+
+- npm, yarn, pnpm, or bun
+
+### Installation
+
+```bash
+# Clone the repository
+git clone https://github.com/Moncito/but-first-coffee.git
+cd but-first-coffee
+
+# Install dependencies
+npm install
+```
+
+### Development
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) to view the site.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Build
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npm run build
+npm start
+```
 
-## Learn More
+## 📁 Project Structure
 
-To learn more about Next.js, take a look at the following resources:
+```
+src/
+├── app/
+│   ├── globals.css        # Global styles
+│   ├── layout.tsx         # Root layout with fonts & smooth scroll
+│   └── page.tsx           # Home page
+├── components/
+│   ├── CoffeeCanvas.tsx   # Scrollytelling image sequence
+│   ├── Cursor.tsx         # Custom cursor
+│   ├── Features.tsx       # Features section
+│   ├── FinalCTA.tsx       # Call to action section
+│   ├── Footer.tsx         # Footer
+│   ├── IntroLoader.tsx    # Loading animation
+│   ├── Navbar.tsx         # Navigation bar
+│   ├── SmoothScroll.tsx   # Lenis smooth scroll wrapper
+│   └── Testimonials.tsx   # Testimonials section
+public/
+└── assets/
+    └── coffee-sequence/   # Image frames for scroll animation
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 📜 License
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+This project is for personal/educational use.
