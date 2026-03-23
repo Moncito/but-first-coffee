@@ -49,9 +49,11 @@ export default function Cursor() {
 
     const handleMouseEnter = (e: MouseEvent) => {
       const target = e.target as HTMLElement;
-      if (target.closest("button") || target.closest("a")) {
-        const isShop = target.innerText.toLowerCase().includes("shop") || 
-                      target.innerText.toLowerCase().includes("order");
+      const container = target.closest("button") || target.closest("a");
+      if (container) {
+        const text = container.innerText || container.textContent || "";
+        const isShop = text.toLowerCase().includes("shop") || 
+                      text.toLowerCase().includes("order");
         setCursorText(isShop ? "ORDER" : "DRINK");
         
         const overLight = isOverLight(e.clientY);
