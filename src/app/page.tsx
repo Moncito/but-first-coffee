@@ -8,6 +8,7 @@ import Features from "@/components/Features";
 import Testimonials from "@/components/Testimonials";
 import FinalCTA from "@/components/FinalCTA";
 import Footer from "@/components/Footer";
+import SoundToggle from "@/components/SoundToggle";
 
 export default function Home() {
   const [isLoaded, setIsLoaded] = useState(false);
@@ -18,6 +19,7 @@ export default function Home() {
       
       <div className={`transition-opacity duration-1000 ${isLoaded ? "opacity-100" : "opacity-0"}`}>
         <Navbar />
+        <SoundToggle />
         
         {/* The Scrollytelling Engine */}
         <CoffeeCanvas frameCount={240} />

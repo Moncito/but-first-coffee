@@ -3,6 +3,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { analytics } from "@/lib/analytics";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -10,29 +11,49 @@ interface CoffeeCanvasProps {
   frameCount?: number;
 }
 
+function useIsMobile() {
+  const [isMobile, setIsMobile] = useState(false);
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < 768);
+    check();
+    window.addEventListener("resize", check);
+    return () => window.removeEventListener("resize", check);
+  }, []);
+  return isMobile;
+}
+
 export default function CoffeeCanvas({ frameCount = 120 }: CoffeeCanvasProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [images, setImages] = useState<HTMLImageElement[]>([]);
   const [isLoaded, setIsLoaded] = useState(false);
+  const isMobile = useIsMobile();
+
+  // On mobile, only load a handful of keyframes instead of all 240
+  const mobileFrameCount = 30;
+  const effectiveFrameCount = isMobile ? mobileFrameCount : frameCount;
 
   // Preload images
   useEffect(() => {
     const loadedImages: HTMLImageElement[] = [];
     let loaded = 0;
 
-    for (let i = 0; i < frameCount; i++) {
+    const step = isMobile ? Math.floor(frameCount / mobileFrameCount) : 1;
+    const total = isMobile ? mobileFrameCount : frameCount;
+
+    for (let i = 0; i < total; i++) {
       const img = new Image();
-      const frameStr = i.toString().padStart(3, "0");
+      const frameIndex = isMobile ? i * step : i;
+      const frameStr = frameIndex.toString().padStart(3, "0");
       img.src = `/assets/coffee-sequence/frame_${frameStr}_delay-0.033s.jpg`;
       img.onload = () => {
         loaded++;
-        if (loaded === frameCount) setIsLoaded(true);
+        if (loaded === total) setIsLoaded(true);
       };
       loadedImages.push(img);
     }
     setImages(loadedImages);
-  }, [frameCount]);
+  }, [frameCount, isMobile]);
 
   // Unified GSAP Timeline
   useEffect(() => {
@@ -57,12 +78,13 @@ export default function CoffeeCanvas({ frameCount = 120 }: CoffeeCanvasProps) {
     render(0);
 
     // ── Master ScrollTrigger ──
-    // +=600% gives each phrase its own "page" of scroll
+    // +=600% gives each phrase its own "page" of scroll (less on mobile)
+    const scrollEnd = isMobile ? "+=400%" : "+=600%";
     const masterTl = gsap.timeline({
       scrollTrigger: {
         trigger: containerRef.current,
         start: "top top",
-        end: "+=600%",
+        end: scrollEnd,
         scrub: 0.6,
         pin: true,
         pinSpacing: true,
@@ -73,7 +95,7 @@ export default function CoffeeCanvas({ frameCount = 120 }: CoffeeCanvasProps) {
     masterTl.to(
       { frame: 0 },
       {
-        frame: frameCount - 1,
+        frame: effectiveFrameCount - 1,
         duration: 1,
         ease: "none",
         onUpdate: function () {
@@ -186,6 +208,33 @@ export default function CoffeeCanvas({ frameCount = 120 }: CoffeeCanvasProps) {
     // ════════════════════════════════════════
     animateBeat(".beat-4", ".b4-heading", ".b4-sub", ".b4-line", 0.73, 0.96);
 
+    // ── Analytics: track beat views & scroll depth ──
+    const beatTracked = [false, false, false, false];
+    const beatNames = ["Obsessively Sourced", "The Perfect Grind", "Artisan Extraction", "But First Coffee"];
+    const beatStarts = [0.04, 0.27, 0.50, 0.73];
+    const depthTracked = { 25: false, 50: false, 75: false, 100: false };
+
+    ScrollTrigger.create({
+      trigger: containerRef.current,
+      start: "top top",
+      end: scrollEnd,
+      onUpdate: (self) => {
+        const p = self.progress;
+        beatStarts.forEach((start, i) => {
+          if (p >= start && !beatTracked[i]) {
+            beatTracked[i] = true;
+            analytics.beatViewed(i + 1, beatNames[i]);
+          }
+        });
+        for (const threshold of [25, 50, 75, 100] as const) {
+          if (p * 100 >= threshold && !depthTracked[threshold]) {
+            depthTracked[threshold] = true;
+            analytics.scrollDepth(threshold);
+          }
+        }
+      },
+    });
+
     return () => {
       ScrollTrigger.getAll().forEach((st) => st.kill());
     };
@@ -267,6 +316,13 @@ export default function CoffeeCanvas({ frameCount = 120 }: CoffeeCanvasProps) {
 
         {/* Vignette — stronger center darkening for text readability */}
         <div className="absolute inset-0 z-[5] pointer-events-none bg-[radial-gradient(ellipse_at_center,rgba(0,0,0,0.3)_0%,rgba(0,0,0,0.65)_100%)]" />
+
+        {/* Steam effect — subtle rising wisps */}
+        <div className="steam-container absolute bottom-0 left-1/2 -translate-x-1/2 z-[6] pointer-events-none w-full h-1/2 overflow-hidden opacity-30">
+          <div className="steam-wisp steam-wisp-1" />
+          <div className="steam-wisp steam-wisp-2" />
+          <div className="steam-wisp steam-wisp-3" />
+        </div>
       </div>
     </div>
   );

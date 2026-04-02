@@ -86,3 +86,66 @@ body {
     0 1px 20px rgba(0, 0, 0, 0.6),
     0 2px 40px rgba(0, 0, 0, 0.3);
 }
+
+/* ── Steam Effect ── */
+@keyframes steam-rise {
+  0% {
+    transform: translateY(0) scaleX(1);
+    opacity: 0;
+  }
+  15% {
+    opacity: 0.6;
+  }
+  50% {
+    transform: translateY(-40vh) scaleX(1.5);
+    opacity: 0.3;
+  }
+  100% {
+    transform: translateY(-80vh) scaleX(2);
+    opacity: 0;
+  }
+}
+
+@keyframes steam-sway {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(15px); }
+  75% { transform: translateX(-15px); }
+}
+
+.steam-wisp {
+  position: absolute;
+  bottom: 0;
+  width: 60px;
+  height: 120px;
+  background: radial-gradient(ellipse, rgba(255,255,255,0.15) 0%, transparent 70%);
+  border-radius: 50%;
+  filter: blur(20px);
+  animation: steam-rise 6s ease-out infinite, steam-sway 4s ease-in-out infinite;
+}
+
+.steam-wisp-1 {
+  left: 42%;
+  animation-delay: 0s;
+}
+
+.steam-wisp-2 {
+  left: 50%;
+  animation-delay: 2s;
+  width: 80px;
+  height: 160px;
+}
+
+.steam-wisp-3 {
+  left: 56%;
+  animation-delay: 4s;
+  width: 50px;
+  height: 100px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .steam-wisp,
+  .grain-overlay,
+  .animate-marquee {
+    animation: none !important;
+  }
+}
