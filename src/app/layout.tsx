@@ -3,6 +3,7 @@ import { Inter_Tight, Geist_Mono, Space_Grotesk } from "next/font/google";
 import "./globals.css";
 import SmoothScroll from "@/components/SmoothScroll";
 import Cursor from "@/components/Cursor";
+import PageTransition from "@/components/PageTransition";
 
 const interTight = Inter_Tight({
   variable: "--font-inter-tight",
@@ -36,7 +37,9 @@ export default function RootLayout({
       <body className={`${interTight.variable} ${geistMono.variable} ${spaceGrotesk.variable} antialiased selection:bg-white selection:text-black overflow-x-hidden`}>
         <Cursor />
         <SmoothScroll>
-          {children}
+          <PageTransition>
+            {children}
+          </PageTransition>
         </SmoothScroll>
       </body>
     </html>

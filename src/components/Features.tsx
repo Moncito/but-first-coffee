@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useCallback } from "react";
 import Image from "next/image";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
@@ -8,8 +8,58 @@ import { ArrowRight, Calendar, Flame, Coffee, Leaf, MapPin, Droplet } from "luci
 
 gsap.registerPlugin(ScrollTrigger);
 
+// 3D tilt handler for bento cards
+function useTiltCards(containerRef: React.RefObject<HTMLDivElement | null>) {
+  const handleMouseMove = useCallback((e: MouseEvent) => {
+    const card = (e.currentTarget as HTMLElement);
+    const rect = card.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    const centerX = rect.width / 2;
+    const centerY = rect.height / 2;
+    const rotateX = ((y - centerY) / centerY) * -8;
+    const rotateY = ((x - centerX) / centerX) * 8;
+
+    gsap.to(card, {
+      rotateX,
+      rotateY,
+      transformPerspective: 800,
+      duration: 0.4,
+      ease: "power2.out",
+    });
+  }, []);
+
+  const handleMouseLeave = useCallback((e: MouseEvent) => {
+    gsap.to(e.currentTarget as HTMLElement, {
+      rotateX: 0,
+      rotateY: 0,
+      duration: 0.6,
+      ease: "elastic.out(1, 0.5)",
+    });
+  }, []);
+
+  useEffect(() => {
+    if (!containerRef.current) return;
+    const cards = containerRef.current.querySelectorAll<HTMLElement>(".bento-card");
+    cards.forEach((card) => {
+      card.style.transformStyle = "preserve-3d";
+      card.addEventListener("mousemove", handleMouseMove);
+      card.addEventListener("mouseleave", handleMouseLeave);
+    });
+    return () => {
+      cards.forEach((card) => {
+        card.removeEventListener("mousemove", handleMouseMove);
+        card.removeEventListener("mouseleave", handleMouseLeave);
+      });
+    };
+  }, [containerRef, handleMouseMove, handleMouseLeave]);
+}
+
 export default function Features() {
   const containerRef = useRef<HTMLDivElement>(null);
+
+  // Enable 3D tilt effect on bento cards
+  useTiltCards(containerRef);
 
   useEffect(() => {
     // Reveal header

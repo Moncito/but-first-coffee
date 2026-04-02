@@ -3,6 +3,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { analytics } from "@/lib/analytics";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -112,6 +113,7 @@ export default function Navbar() {
 
         <button
           ref={shopBtnRef}
+          onClick={() => analytics.shopNowClick()}
           className={`
             px-5 py-1.5 font-bold text-[10px] uppercase tracking-widest rounded-full transition-all duration-500
             ${isDark

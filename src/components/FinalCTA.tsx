@@ -1,15 +1,21 @@
 "use client";
 
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
+import { analytics } from "@/lib/analytics";
 
 export default function FinalCTA() {
   const buttonRef = useRef<HTMLButtonElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  const [isTouchDevice, setIsTouchDevice] = useState(false);
+
+  useEffect(() => {
+    setIsTouchDevice("ontouchstart" in window || navigator.maxTouchPoints > 0);
+  }, []);
 
   useEffect(() => {
     const btn = buttonRef.current;
-    if (!btn) return;
+    if (!btn || isTouchDevice) return;
 
     const handleMouseMove = (e: MouseEvent) => {
       const rect = btn.getBoundingClientRect();
@@ -37,7 +43,7 @@ export default function FinalCTA() {
 
     window.addEventListener("mousemove", handleMouseMove);
     return () => window.removeEventListener("mousemove", handleMouseMove);
-  }, []);
+  }, [isTouchDevice]);
 
   return (
     <section 
@@ -60,6 +66,8 @@ export default function FinalCTA() {
             
             <button
               ref={buttonRef}
+              onClick={() => analytics.ctaClick()}
+              onMouseEnter={() => analytics.ctaHover()}
               className="px-16 py-8 bg-white text-black font-bold text-xl uppercase tracking-[0.3em] rounded-full hover:bg-white/90 transition-colors shadow-2xl relative block mx-auto"
             >
               Order Now
