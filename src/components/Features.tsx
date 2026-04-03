@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useRef, useCallback } from "react";
+import React, { useEffect, useRef, useCallback, lazy, Suspense } from "react";
 import Image from "next/image";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
@@ -254,9 +254,9 @@ export default function Features() {
                <Image 
                  src="https://images.unsplash.com/photo-1525088553748-01d6e210e00b?auto=format&fit=crop&q=80"
                  alt="Coffee Farm"
-                 width={800}
-                 height={600}
-                 unoptimized
+                 fill
+                 sizes="(max-width: 768px) 100%, 66%"
+                 loading="lazy"
                  className="w-full h-full object-cover opacity-80"
                />
             </div>
@@ -273,7 +273,7 @@ export default function Features() {
                   alt="Latte Art" 
                   width={80}
                   height={80}
-                  unoptimized
+                  loading="lazy"
                   className="w-full h-full object-cover" 
                 />
               </div>
@@ -301,9 +301,9 @@ export default function Features() {
               <Image 
                 src="https://images.unsplash.com/photo-1582216630806-031e427d1421?auto=format&fit=crop&q=80&w=800" 
                 alt="Coffee Pour Over" 
-                width={400}
-                height={300}
-                unoptimized
+                fill
+                sizes="(max-width: 768px) 100%, 50%"
+                loading="lazy"
                 className="w-full h-full object-cover opacity-90 mix-blend-multiply"
               />
             </div>

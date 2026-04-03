@@ -1,7 +1,8 @@
 "use client";
 
-import React from "react";
+import React, { Suspense } from "react";
 import { Play } from "lucide-react";
+import Image from "next/image";
 
 const testimonials = [
   {
@@ -62,6 +63,72 @@ const testimonials = [
   }
 ];
 
+// Memoized testimonial card component
+const TestimonialCard = React.memo(({ item, index }: { item: typeof testimonials[0], index: number }) => (
+  <div key={index} className="pr-6 shrink-0">
+    <div
+      className={`relative w-[320px] md:w-[380px] min-h-[480px] rounded-[2rem] p-8 flex flex-col shadow-[0_8px_30px_rgb(0,0,0,0.04)] transition-transform hover:-translate-y-1 duration-300 ${
+        item.type === "video" ? "text-white justify-between overflow-hidden" : "bg-white text-black"
+      }`}
+    >
+      {item.type === "video" && item.videoThumbnail && (
+        <>
+          <Image 
+            src={item.videoThumbnail} 
+            alt="Video thumbnail" 
+            fill
+            sizes="(max-width: 768px) 320px, 380px"
+            className="absolute inset-0 w-full h-full object-cover"
+            loading="lazy"
+            priority={false}
+          />
+          <div className="absolute inset-0 bg-black/10" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+        </>
+      )}
+      
+      <div className="relative z-10 flex flex-col h-full">
+        {/* Avatar */}
+        <div className="mb-6">
+          <Image 
+            src={item.avatar} 
+            alt={item.name}
+            width={48}
+            height={48}
+            className={`w-12 h-12 rounded-full object-cover ${item.type === "video" ? "border-2 border-[#D4AF37]" : ""}`}
+            loading="lazy"
+          />
+        </div>
+
+        {/* Content */}
+        {item.type === "text" ? (
+          <p className="text-gray-700 text-[16px] leading-relaxed mb-8 flex-grow">
+            {item.quote}
+          </p>
+        ) : (
+          <div className="flex-grow flex items-center justify-center">
+            <button className="w-16 h-10 bg-white/30 backdrop-blur-md rounded-2xl flex items-center justify-center hover:bg-white/40 transition-colors cursor-pointer">
+              <Play className="w-5 h-5 text-white fill-white ml-1" />
+            </button>
+          </div>
+        )}
+
+        {/* Footer / Signature */}
+        <div className="mt-auto pt-4">
+          <div className="font-signature text-gray-900 leading-none mb-1 text-[2.5rem]">
+            {item.type === "video" ? <span className="text-white">{item.name}</span> : item.name}
+          </div>
+          <div className={`text-sm tracking-wide ${item.type === "video" ? "text-gray-300" : "text-gray-400"}`}>
+            {item.role}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+));
+
+TestimonialCard.displayName = "TestimonialCard";
+
 export default function Testimonials() {
   const carouselItems = [...testimonials, ...testimonials];
 
@@ -85,59 +152,9 @@ export default function Testimonials() {
         {/* Animated Marquee */}
         <div className="flex w-max animate-marquee hover:pause-animation">
           {carouselItems.map((t, i) => (
-            <div key={i} className="pr-6 shrink-0">
-              <div
-                className={`relative w-[320px] md:w-[380px] min-h-[480px] rounded-[2rem] p-8 flex flex-col shadow-[0_8px_30px_rgb(0,0,0,0.04)] transition-transform hover:-translate-y-1 duration-300 ${
-                  t.type === "video" ? "text-white justify-between overflow-hidden" : "bg-white text-black"
-                }`}
-              >
-                {t.type === "video" && t.videoThumbnail && (
-                  <>
-                    <img 
-                      src={t.videoThumbnail} 
-                      alt="Video thumbnail" 
-                      className="absolute inset-0 w-full h-full object-cover"
-                    />
-                    <div className="absolute inset-0 bg-black/10" />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
-                  </>
-                )}
-                
-                <div className="relative z-10 flex flex-col h-full">
-                  {/* Avatar */}
-                  <div className="mb-6">
-                    <img 
-                      src={t.avatar} 
-                      alt={t.name}
-                      className={`w-12 h-12 rounded-full object-cover ${t.type === "video" ? "border-2 border-[#D4AF37]" : ""}`}
-                    />
-                  </div>
-
-                  {/* Content */}
-                  {t.type === "text" ? (
-                    <p className="text-gray-700 text-[16px] leading-relaxed mb-8 flex-grow">
-                      {t.quote}
-                    </p>
-                  ) : (
-                    <div className="flex-grow flex items-center justify-center">
-                      <button className="w-16 h-10 bg-white/30 backdrop-blur-md rounded-2xl flex items-center justify-center hover:bg-white/40 transition-colors cursor-pointer">
-                        <Play className="w-5 h-5 text-white fill-white ml-1" />
-                      </button>
-                    </div>
-                  )}
-
-                  {/* Footer / Signature */}
-                  <div className="mt-auto pt-4">
-                    <div className="font-signature text-gray-900 leading-none mb-1 text-[2.5rem]">
-                      {t.type === "video" ? <span className="text-white">{t.name}</span> : t.name}
-                    </div>
-                    <div className={`text-sm tracking-wide ${t.type === "video" ? "text-gray-300" : "text-gray-400"}`}>
-                      {t.role}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
+            <Suspense key={i} fallback={<div className="w-[320px] md:w-[380px] shrink-0" />}>
+              <TestimonialCard item={t} index={i} />
+            </Suspense>
           ))}
         </div>
       </div>
