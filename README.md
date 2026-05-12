@@ -1,8 +1,8 @@
-# ☕ But First, Coffee
+# But First, Coffee
 
 A visually rich, scroll-driven coffee shop website built with **Next.js**, **GSAP**, **Framer Motion**, and **Lenis** smooth scrolling. The site features a scrollytelling coffee-sequence animation, smooth transitions, a custom cursor, and a polished dark aesthetic.
 
-## ✨ Features
+## Features
 
 - **Scrollytelling Canvas** — A 240-frame coffee image sequence that plays as you scroll, powered by GSAP ScrollTrigger.
 - **Smooth Scrolling** — Buttery smooth scroll experience using Lenis.
@@ -11,7 +11,7 @@ A visually rich, scroll-driven coffee shop website built with **Next.js**, **GSA
 - **Sections** — Features, Testimonials, and a Final CTA section with scroll-based animations.
 - **Dark Theme** — A sleek `#0A0A0A` dark background throughout.
 
-## 🛠 Tech Stack
+## Tech Stack
 
 | Technology                                     | Purpose                                  |
 | ---------------------------------------------- | ---------------------------------------- |
@@ -24,7 +24,7 @@ A visually rich, scroll-driven coffee shop website built with **Next.js**, **GSA
 | [Lucide React](https://lucide.dev)             | Icons                                    |
 | TypeScript                                     | Type safety                              |
 
-## 🚀 Getting Started
+## Getting Started
 
 ### Prerequisites
 
@@ -57,7 +57,7 @@ npm run build
 npm start
 ```
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 src/
@@ -80,6 +80,6 @@ public/
     └── coffee-sequence/   # Image frames for scroll animation
 ```
 
-## 📜 License
+## License
 
 This project is for personal/educational use.
