@@ -1,4 +1,4 @@
-# But First, Coffee
+# But First, Coffee (3D Scroll Driven Website)
 
 A visually rich, scroll-driven coffee shop website built with **Next.js**, **GSAP**, **Framer Motion**, and **Lenis** smooth scrolling. The site features a scrollytelling coffee-sequence animation, smooth transitions, a custom cursor, and a polished dark aesthetic.
 
