@@ -82,4 +82,4 @@ public/
 
 ## License
 
-This project is for personal/educational use.
+This project is for personal/educational use only
